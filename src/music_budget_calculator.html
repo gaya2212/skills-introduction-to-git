@@ -30,11 +30,13 @@
       max-width: 720px;
       backdrop-filter: blur(12px);
       box-shadow: 0 24px 64px rgba(0,0,0,0.55);
+      animation: slideInDown 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+      opacity: 0;
     }
 
-    h1 { font-size: 1.6rem; font-weight: 700; letter-spacing: -0.3px; color: #fff; margin-bottom: 0.3rem; }
+    h1 { font-size: 1.6rem; font-weight: 700; letter-spacing: -0.3px; color: #fff; margin-bottom: 0.3rem; animation: fadeInUp 0.8s ease 0.1s forwards; opacity: 0; }
     h1 span { color: #a78bfa; }
-    .subtitle { font-size: 0.85rem; color: #7a7a9a; margin-bottom: 2rem; }
+    .subtitle { font-size: 0.85rem; color: #7a7a9a; margin-bottom: 2rem; animation: fadeInUp 0.8s ease 0.2s forwards; opacity: 0; }
 
     /* ── Step labels ── */
     .step-label {
@@ -44,7 +46,12 @@
       color: #a78bfa;
       font-weight: 600;
       margin-bottom: 0.6rem;
+      animation: fadeInUp 0.6s ease forwards;
+      opacity: 0;
     }
+    .step-label:nth-of-type(1) { animation-delay: 0.3s; }
+    .step-label:nth-of-type(2) { animation-delay: 0.6s; }
+    .step-label:nth-of-type(3) { animation-delay: 0.9s; }
 
     /* ── Option grid (project type & tier) ── */
     .option-grid {
@@ -65,17 +72,32 @@
       font-weight: 500;
       cursor: pointer;
       text-align: center;
-      transition: border-color 0.18s, background 0.18s, color 0.18s;
+      transition: border-color 0.18s, background 0.18s, color 0.18s, transform 0.2s ease, box-shadow 0.2s ease;
       line-height: 1.4;
+      animation: fadeInUp 0.5s ease forwards;
+      opacity: 0;
     }
+    .option-grid.cols-4 .opt-btn:nth-child(1) { animation-delay: 0.35s; }
+    .option-grid.cols-4 .opt-btn:nth-child(2) { animation-delay: 0.40s; }
+    .option-grid.cols-4 .opt-btn:nth-child(3) { animation-delay: 0.45s; }
+    .option-grid.cols-4 .opt-btn:nth-child(4) { animation-delay: 0.50s; }
+    .option-grid.cols-3 .opt-btn:nth-child(1) { animation-delay: 0.65s; }
+    .option-grid.cols-3 .opt-btn:nth-child(2) { animation-delay: 0.70s; }
+    .option-grid.cols-3 .opt-btn:nth-child(3) { animation-delay: 0.75s; }
     .opt-btn .opt-title { font-size: 0.88rem; font-weight: 700; color: #e0e0f4; display: block; margin-bottom: 0.2rem; }
     .opt-btn .opt-sub   { font-size: 0.72rem; color: #6a6a8a; }
-    .opt-btn:hover { border-color: #a78bfa; background: rgba(167,139,250,0.08); }
+    .opt-btn:hover { 
+      border-color: #a78bfa; 
+      background: rgba(167,139,250,0.08); 
+      transform: translateY(-2px);
+      box-shadow: 0 8px 16px rgba(167,139,250,0.15);
+    }
     .opt-btn.selected {
       border-color: #a78bfa;
       background: rgba(167,139,250,0.15);
       color: #fff;
       box-shadow: 0 0 0 2px rgba(167,139,250,0.25);
+      transform: scale(1.02);
     }
     .opt-btn.selected .opt-title { color: #c4b5fd; }
 
@@ -85,8 +107,20 @@
     .opt-btn.tier-premium.selected  { border-color: #f59e0b; background: rgba(245,158,11,0.12); box-shadow: 0 0 0 2px rgba(245,158,11,0.2); }
 
     /* ── Budget input ── */
-    .input-row { display: flex; gap: 0.6rem; margin-bottom: 0.5rem; }
-    .input-hint { font-size: 0.76rem; color: #5a5a7a; margin-bottom: 1.4rem; }
+    .input-row { 
+      display: flex; 
+      gap: 0.6rem; 
+      margin-bottom: 0.5rem;
+      animation: fadeInUp 0.6s ease 0.85s forwards;
+      opacity: 0;
+    }
+    .input-hint { 
+      font-size: 0.76rem; 
+      color: #5a5a7a; 
+      margin-bottom: 1.4rem;
+      animation: fadeInUp 0.6s ease 0.90s forwards;
+      opacity: 0;
+    }
 
     .input-wrap { flex: 1; position: relative; }
     .input-wrap .prefix {
@@ -107,9 +141,28 @@
       background: linear-gradient(135deg, #7c3aed, #a78bfa);
       border: none; border-radius: 10px; color: #fff;
       font-size: 0.95rem; font-weight: 600; cursor: pointer;
-      transition: opacity 0.2s, transform 0.1s; white-space: nowrap;
+      transition: opacity 0.2s, transform 0.15s, box-shadow 0.2s ease; 
+      white-space: nowrap;
+      position: relative;
+      overflow: hidden;
     }
-    button.primary:hover { opacity: 0.88; }
+    button.primary::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: rgba(255,255,255,0.1);
+      transition: left 0.3s ease;
+      z-index: 0;
+    }
+    button.primary:hover::before { left: 100%; }
+    button.primary:hover { 
+      opacity: 0.88;
+      transform: translateY(-3px);
+      box-shadow: 0 8px 20px rgba(124,58,237,0.35);
+    }
     button.primary:active { transform: scale(0.97); }
 
     /* ── Alerts ── */
@@ -117,14 +170,17 @@
       display: none; align-items: center; gap: 0.6rem;
       padding: 0.75rem 1rem; border-radius: 10px;
       font-size: 0.88rem; font-weight: 500; margin-bottom: 1.2rem;
-      animation: fadeIn 0.3s ease;
+      animation: slideInAlert 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
     }
     .alert.error   { background: rgba(239,68,68,0.13);  border: 1px solid rgba(239,68,68,0.35);  color: #fca5a5; }
     .alert.warn    { background: rgba(234,179,8,0.12);  border: 1px solid rgba(234,179,8,0.35);  color: #fde68a; }
     .alert.success { background: rgba(34,197,94,0.11);  border: 1px solid rgba(34,197,94,0.35);  color: #86efac; }
 
     /* ── Results ── */
-    #results { display: none; animation: fadeIn 0.4s ease; }
+    #results { 
+      display: none; 
+      animation: fadeInUp 0.6s ease;
+    }
 
     .total-banner {
       display: grid; grid-template-columns: 1fr 1fr;
@@ -135,7 +191,11 @@
       background: rgba(255,255,255,0.04);
       border: 1px solid rgba(255,255,255,0.08);
       border-radius: 12px; text-align: center;
+      animation: fadeInUp 0.5s ease forwards;
+      opacity: 0;
     }
+    .total-cell:nth-child(1) { animation-delay: 0.05s; }
+    .total-cell:nth-child(2) { animation-delay: 0.1s; }
     .total-cell.highlight {
       background: linear-gradient(135deg, rgba(124,58,237,0.2), rgba(0,180,160,0.12));
       border-color: rgba(167,139,250,0.3);
@@ -149,7 +209,12 @@
       color: #6a6a8a; font-weight: 600;
       padding: 0.4rem 0; border-bottom: 1px solid rgba(255,255,255,0.07);
       margin-bottom: 1rem;
+      animation: fadeInUp 0.5s ease forwards;
+      opacity: 0;
     }
+    #results .section-header:nth-of-type(1) { animation-delay: 0.15s; }
+    #results .section-header:nth-of-type(2) { animation-delay: 0.35s; }
+    #results .section-header:nth-of-type(3) { animation-delay: 0.55s; }
 
     /* ── Category cards ── */
     .categories { display: flex; flex-direction: column; gap: 0.8rem; margin-bottom: 1.6rem; }
@@ -158,9 +223,21 @@
       background: rgba(255,255,255,0.03);
       border: 1px solid rgba(255,255,255,0.07);
       border-radius: 12px; padding: 1rem 1.2rem;
-      transition: border-color 0.2s;
+      transition: all 0.3s ease;
+      animation: fadeInUp 0.5s ease forwards;
+      opacity: 0;
     }
-    .cat-card:hover { border-color: rgba(167,139,250,0.25); }
+    .categories .cat-card:nth-child(1) { animation-delay: 0.2s; }
+    .categories .cat-card:nth-child(2) { animation-delay: 0.25s; }
+    .categories .cat-card:nth-child(3) { animation-delay: 0.30s; }
+    .categories .cat-card:nth-child(4) { animation-delay: 0.35s; }
+    .categories .cat-card:nth-child(5) { animation-delay: 0.40s; }
+    .cat-card:hover { 
+      border-color: rgba(167,139,250,0.25);
+      background: rgba(255,255,255,0.05);
+      transform: translateX(4px);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    }
 
     .cat-header { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 0.5rem; }
     .cat-name   { font-weight: 600; font-size: 0.95rem; color: #d4d4f0; }
@@ -191,16 +268,28 @@
       background: rgba(255,255,255,0.04);
       border: 1px solid rgba(255,255,255,0.08);
       border-radius: 12px; padding: 1rem 1.2rem; text-align: center;
+      animation: fadeInUp 0.5s ease forwards;
+      opacity: 0;
     }
+    .gt-cell:nth-child(1) { animation-delay: 0.60s; }
+    .gt-cell:nth-child(2) { animation-delay: 0.65s; }
     .gt-cell .gt-label  { font-size: 0.68rem; text-transform: uppercase; letter-spacing: 1px; color: #5a5a7a; margin-bottom: 0.3rem; }
     .gt-cell .gt-amount { font-size: 1.2rem; font-weight: 700; color: #e0e0f4; }
 
     /* ── Again / exit ── */
-    .divider { height: 1px; background: rgba(255,255,255,0.07); margin: 1.4rem 0; }
+    .divider { 
+      height: 1px; 
+      background: rgba(255,255,255,0.07); 
+      margin: 1.4rem 0;
+      animation: slideInDivider 0.6s ease 0.72s forwards;
+      opacity: 0;
+      transform: scaleX(0);
+    }
 
     .again-row {
       display: none; align-items: center; gap: 0.8rem;
-      justify-content: center; animation: fadeIn 0.3s ease;
+      justify-content: center; 
+      animation: fadeInUp 0.6s ease 0.78s;
     }
     .again-row p { font-size: 0.88rem; color: #7a7a9a; }
     .btn-secondary {
@@ -209,9 +298,60 @@
       border: 1px solid rgba(255,255,255,0.12);
       border-radius: 10px; color: #fff;
       font-size: 0.95rem; font-weight: 600; cursor: pointer;
-      transition: background 0.2s;
+      transition: all 0.2s ease;
     }
-    .btn-secondary:hover { background: rgba(255,255,255,0.12); }
+    .btn-secondary:hover { 
+      background: rgba(255,255,255,0.12);
+      transform: translateY(-2px);
+      border-color: rgba(255,255,255,0.2);
+      box-shadow: 0 4px 12px rgba(255,255,255,0.1);
+    }
+    .btn-secondary:active { transform: scale(0.97); }
+
+    /* ── Comprehensive Keyframe Animations ── */
+    @keyframes slideInDown {
+      from {
+        opacity: 0;
+        transform: translateY(-30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(16px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes slideInAlert {
+      from {
+        opacity: 0;
+        transform: translateX(-20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateX(0);
+      }
+    }
+
+    @keyframes slideInDivider {
+      from {
+        opacity: 0;
+        transform: scaleX(0);
+      }
+      to {
+        opacity: 1;
+        transform: scaleX(1);
+      }
+    }
 
     @keyframes fadeIn {
       from { opacity: 0; transform: translateY(6px); }
