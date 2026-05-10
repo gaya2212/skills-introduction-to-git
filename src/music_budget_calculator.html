@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>🎵 Music Production Budget Calculator</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      min-height: 100vh;
+      background: #0d0d14;
+      background-image:
+        radial-gradient(ellipse 80% 50% at 20% 10%, rgba(99,60,180,0.18) 0%, transparent 60%),
+        radial-gradient(ellipse 60% 40% at 80% 80%, rgba(0,180,160,0.12) 0%, transparent 60%);
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      color: #e8e8f0;
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+      padding: 2.5rem 1rem 4rem;
+    }
+
+    .card {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.09);
+      border-radius: 20px;
+      padding: 2.5rem 2.8rem;
+      width: 100%;
+      max-width: 720px;
+      backdrop-filter: blur(12px);
+      box-shadow: 0 24px 64px rgba(0,0,0,0.55);
+    }
+
+    h1 { font-size: 1.6rem; font-weight: 700; letter-spacing: -0.3px; color: #fff; margin-bottom: 0.3rem; }
+    h1 span { color: #a78bfa; }
+    .subtitle { font-size: 0.85rem; color: #7a7a9a; margin-bottom: 2rem; }
+
+    /* ── Step labels ── */
+    .step-label {
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 1.2px;
+      color: #a78bfa;
+      font-weight: 600;
+      margin-bottom: 0.6rem;
+    }
+
+    /* ── Option grid (project type & tier) ── */
+    .option-grid {
+      display: grid;
+      gap: 0.6rem;
+      margin-bottom: 1.6rem;
+    }
+    .option-grid.cols-4 { grid-template-columns: repeat(4, 1fr); }
+    .option-grid.cols-3 { grid-template-columns: repeat(3, 1fr); }
+
+    .opt-btn {
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 12px;
+      padding: 0.75rem 0.5rem;
+      color: #c4c4e0;
+      font-size: 0.82rem;
+      font-weight: 500;
+      cursor: pointer;
+      text-align: center;
+      transition: border-color 0.18s, background 0.18s, color 0.18s;
+      line-height: 1.4;
+    }
+    .opt-btn .opt-title { font-size: 0.88rem; font-weight: 700; color: #e0e0f4; display: block; margin-bottom: 0.2rem; }
+    .opt-btn .opt-sub   { font-size: 0.72rem; color: #6a6a8a; }
+    .opt-btn:hover { border-color: #a78bfa; background: rgba(167,139,250,0.08); }
+    .opt-btn.selected {
+      border-color: #a78bfa;
+      background: rgba(167,139,250,0.15);
+      color: #fff;
+      box-shadow: 0 0 0 2px rgba(167,139,250,0.25);
+    }
+    .opt-btn.selected .opt-title { color: #c4b5fd; }
+
+    /* Tier colours */
+    .opt-btn.tier-budget.selected   { border-color: #38bdf8; background: rgba(56,189,248,0.12); box-shadow: 0 0 0 2px rgba(56,189,248,0.2); }
+    .opt-btn.tier-standard.selected { border-color: #a78bfa; background: rgba(167,139,250,0.15); box-shadow: 0 0 0 2px rgba(167,139,250,0.25); }
+    .opt-btn.tier-premium.selected  { border-color: #f59e0b; background: rgba(245,158,11,0.12); box-shadow: 0 0 0 2px rgba(245,158,11,0.2); }
+
+    /* ── Budget input ── */
+    .input-row { display: flex; gap: 0.6rem; margin-bottom: 0.5rem; }
+    .input-hint { font-size: 0.76rem; color: #5a5a7a; margin-bottom: 1.4rem; }
+
+    .input-wrap { flex: 1; position: relative; }
+    .input-wrap .prefix {
+      position: absolute; left: 14px; top: 50%; transform: translateY(-50%);
+      color: #a78bfa; font-weight: 600; font-size: 1.05rem; pointer-events: none;
+    }
+    .input-wrap input {
+      width: 100%; padding: 0.75rem 1rem 0.75rem 2rem;
+      background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.13);
+      border-radius: 10px; color: #fff; font-size: 1rem; outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .input-wrap input:focus { border-color: #a78bfa; box-shadow: 0 0 0 3px rgba(167,139,250,0.18); }
+    .input-wrap input::placeholder { color: #555570; }
+
+    button.primary {
+      padding: 0.75rem 1.4rem;
+      background: linear-gradient(135deg, #7c3aed, #a78bfa);
+      border: none; border-radius: 10px; color: #fff;
+      font-size: 0.95rem; font-weight: 600; cursor: pointer;
+      transition: opacity 0.2s, transform 0.1s; white-space: nowrap;
+    }
+    button.primary:hover { opacity: 0.88; }
+    button.primary:active { transform: scale(0.97); }
+
+    /* ── Alerts ── */
+    .alert {
+      display: none; align-items: center; gap: 0.6rem;
+      padding: 0.75rem 1rem; border-radius: 10px;
+      font-size: 0.88rem; font-weight: 500; margin-bottom: 1.2rem;
+      animation: fadeIn 0.3s ease;
+    }
+    .alert.error   { background: rgba(239,68,68,0.13);  border: 1px solid rgba(239,68,68,0.35);  color: #fca5a5; }
+    .alert.warn    { background: rgba(234,179,8,0.12);  border: 1px solid rgba(234,179,8,0.35);  color: #fde68a; }
+    .alert.success { background: rgba(34,197,94,0.11);  border: 1px solid rgba(34,197,94,0.35);  color: #86efac; }
+
+    /* ── Results ── */
+    #results { display: none; animation: fadeIn 0.4s ease; }
+
+    .total-banner {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 0.8rem; margin-bottom: 1.6rem;
+    }
+    .total-cell {
+      padding: 1rem 1.2rem;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 12px; text-align: center;
+    }
+    .total-cell.highlight {
+      background: linear-gradient(135deg, rgba(124,58,237,0.2), rgba(0,180,160,0.12));
+      border-color: rgba(167,139,250,0.3);
+    }
+    .total-cell .tc-label  { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 1px; color: #6a6a8a; margin-bottom: 0.3rem; }
+    .total-cell .tc-amount { font-size: 1.5rem; font-weight: 700; color: #fff; }
+    .total-cell .tc-sub    { font-size: 0.72rem; color: #6a6a8a; margin-top: 0.2rem; }
+
+    .section-header {
+      font-size: 0.78rem; text-transform: uppercase; letter-spacing: 1px;
+      color: #6a6a8a; font-weight: 600;
+      padding: 0.4rem 0; border-bottom: 1px solid rgba(255,255,255,0.07);
+      margin-bottom: 1rem;
+    }
+
+    /* ── Category cards ── */
+    .categories { display: flex; flex-direction: column; gap: 0.8rem; margin-bottom: 1.6rem; }
+
+    .cat-card {
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.07);
+      border-radius: 12px; padding: 1rem 1.2rem;
+      transition: border-color 0.2s;
+    }
+    .cat-card:hover { border-color: rgba(167,139,250,0.25); }
+
+    .cat-header { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 0.5rem; }
+    .cat-name   { font-weight: 600; font-size: 0.95rem; color: #d4d4f0; }
+    .cat-amount { font-size: 1.05rem; font-weight: 700; color: #a78bfa; }
+
+    .bar-wrap { height: 7px; background: rgba(255,255,255,0.07); border-radius: 99px; overflow: hidden; margin-bottom: 0.5rem; }
+    .bar-fill  { height: 100%; border-radius: 99px; transition: width 0.8s cubic-bezier(.4,0,.2,1); }
+
+    .cat-meta { display: flex; justify-content: space-between; align-items: center; }
+    .cat-desc { font-size: 0.75rem; color: #5a5a7a; font-style: italic; }
+    .cat-pct  { font-size: 0.72rem; color: #5a5a7a; }
+
+    /* ── Marketing cards ── */
+    .mktg-card {
+      background: rgba(16,185,129,0.04);
+      border: 1px solid rgba(16,185,129,0.12);
+      border-radius: 12px; padding: 0.9rem 1.2rem;
+    }
+    .mktg-card:hover { border-color: rgba(16,185,129,0.28); }
+    .mktg-range { font-size: 1rem; font-weight: 700; color: #6ee7b7; }
+
+    /* ── Grand total row ── */
+    .grand-total-row {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 0.8rem; margin: 1.4rem 0;
+    }
+    .gt-cell {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 12px; padding: 1rem 1.2rem; text-align: center;
+    }
+    .gt-cell .gt-label  { font-size: 0.68rem; text-transform: uppercase; letter-spacing: 1px; color: #5a5a7a; margin-bottom: 0.3rem; }
+    .gt-cell .gt-amount { font-size: 1.2rem; font-weight: 700; color: #e0e0f4; }
+
+    /* ── Again / exit ── */
+    .divider { height: 1px; background: rgba(255,255,255,0.07); margin: 1.4rem 0; }
+
+    .again-row {
+      display: none; align-items: center; gap: 0.8rem;
+      justify-content: center; animation: fadeIn 0.3s ease;
+    }
+    .again-row p { font-size: 0.88rem; color: #7a7a9a; }
+    .btn-secondary {
+      padding: 0.75rem 1.4rem;
+      background: rgba(255,255,255,0.07);
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 10px; color: #fff;
+      font-size: 0.95rem; font-weight: 600; cursor: pointer;
+      transition: background 0.2s;
+    }
+    .btn-secondary:hover { background: rgba(255,255,255,0.12); }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    @media (max-width: 560px) {
+      .card { padding: 1.6rem 1.2rem; }
+      .option-grid.cols-4 { grid-template-columns: repeat(2, 1fr); }
+      .total-banner, .grand-total-row { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+<div class="card">
+  <h1>🎚 Music <span>Budget</span> Calculator</h1>
+  <p class="subtitle">Real industry cost data · three steps · instant breakdown</p>
+
+  <!-- ── Step 1: Project type ── -->
+  <div class="step-label">Step 1 — Project Type</div>
+  <div class="option-grid cols-4" id="projectGrid"></div>
+
+  <!-- ── Step 2: Tier ── -->
+  <div class="step-label">Step 2 — Budget Tier</div>
+  <div class="option-grid cols-3" id="tierGrid"></div>
+
+  <!-- ── Step 3: Custom budget ── -->
+  <div class="step-label">Step 3 — Your Budget <span style="color:#5a5a7a;font-weight:400;text-transform:none;letter-spacing:0">(optional override)</span></div>
+  <div class="input-row">
+    <div class="input-wrap">
+      <span class="prefix">$</span>
+      <input id="budgetInput" type="number" min="1" placeholder="Leave blank to use recommended" />
+    </div>
+    <button class="primary" onclick="calculate()">Calculate</button>
+  </div>
+  <div class="input-hint" id="recommendedHint">← Select a project type and tier to see the recommended budget</div>
+
+  <!-- Alerts -->
+  <div id="alertError"   class="alert error">  ⚠ Please select a project type and tier first.</div>
+  <div id="alertWarn"    class="alert warn">   ⚠ Warning: Your budget is significantly below the industry average for this project type. Quality may be compromised.</div>
+  <div id="alertSuccess" class="alert success"> ✓ You have headroom in your budget. Consider investing the extra in marketing and promotion.</div>
+
+  <!-- ── Results ── -->
+  <div id="results">
+
+    <!-- Summary banner -->
+    <div class="total-banner">
+      <div class="total-cell highlight">
+        <div class="tc-label">Your Budget</div>
+        <div class="tc-amount" id="yourBudgetDisplay">—</div>
+        <div class="tc-sub" id="projectTierLabel">—</div>
+      </div>
+      <div class="total-cell">
+        <div class="tc-label">Industry Recommended</div>
+        <div class="tc-amount" id="recommendedDisplay">—</div>
+        <div class="tc-sub" id="tierLabel">—</div>
+      </div>
+    </div>
+
+    <!-- Production breakdown -->
+    <div class="section-header">🎛 Production Breakdown</div>
+    <div class="categories" id="categoriesContainer"></div>
+
+    <!-- Marketing estimates -->
+    <div class="section-header">📣 Marketing & Distribution Estimates</div>
+    <div class="categories" id="marketingContainer"></div>
+
+    <!-- Grand totals -->
+    <div class="section-header">💰 Grand Total</div>
+    <div class="grand-total-row">
+      <div class="gt-cell">
+        <div class="gt-label">Production + Min Marketing</div>
+        <div class="gt-amount" id="grandMin">—</div>
+      </div>
+      <div class="gt-cell">
+        <div class="gt-label">Production + Max Marketing</div>
+        <div class="gt-amount" id="grandMax">—</div>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="again-row" id="againRow">
+      <p>Calculate another budget?</p>
+      <button class="primary" onclick="resetAll()">Yes, restart</button>
+      <button class="btn-secondary" onclick="exitApp()">No, exit</button>
+    </div>
+    <div id="exitMsg" style="display:none;text-align:center;color:#5a5a7a;font-size:0.85rem;padding:0.5rem 0;">
+      🎶 Thanks for using the Music Budget Calculator. Good luck with your project!
+    </div>
+  </div>
+</div>
+
+<script>
+  // ── Master cost data (easy to update — mirrors the Python dict exactly) ──
+  const PROJECT_DATA = {
+    single:  { label: "Single",  sub: "1 track",   total: 3750,  costs: { Recording: 750,  Mixing: 1200, Mastering: 400,  Production: 1400 } },
+    demo:    { label: "Demo",    sub: "3 tracks",   total: 6200,  costs: { Recording: 1200, Mixing: 2100, Mastering: 800,  Production: 2100 } },
+    ep:      { label: "EP",      sub: "5 tracks",   total: 11550, costs: { Recording: 2250, Mixing: 3900, Mastering: 1200, Production: 4200 } },
+    lp:      { label: "LP",      sub: "10 tracks",  total: 22500, costs: { Recording: 6000, Mixing: 7500, Mastering: 2000, Production: 7000 } },
+  };
+
+  // Tier multipliers applied to baseline costs
+  const TIER_DATA = {
+    budget:   { label: "Budget",   sub: "home studio", multiplier: 0.5,  cls: "tier-budget"   },
+    standard: { label: "Standard", sub: "mid-level",   multiplier: 1.0,  cls: "tier-standard" },
+    premium:  { label: "Premium",  sub: "high-end",    multiplier: 2.5,  cls: "tier-premium"  },
+  };
+
+  // Marketing estimate ranges [min, max] with display info
+  const MARKETING_ESTIMATES = [
+    { name: "Distribution fee",        desc: "Pay-per-release or annual subscription",    range: [20,    50],   unit: "per release / yr",    colors: ["#10b981","#6ee7b7"] },
+    { name: "Promotion (indie)",       desc: "Social ads, blog features, online PR",       range: [200,   500],  unit: "per single",          colors: ["#10b981","#6ee7b7"] },
+    { name: "Playlist pitching",       desc: "Independent playlist submission services",   range: [50,    300],  unit: "per submission",      colors: ["#10b981","#6ee7b7"] },
+    { name: "PR agency (optional)",    desc: "Full-service press and media outreach",       range: [1500,  5000], unit: "per month",           colors: ["#10b981","#6ee7b7"] },
+  ];
+
+  // Visual gradient per production category
+  const CAT_COLORS = {
+    Recording:   ["#7c3aed","#a78bfa"],
+    Mixing:      ["#0ea5e9","#38bdf8"],
+    Mastering:   ["#06b6d4","#67e8f9"],
+    Production:  ["#f59e0b","#fcd34d"],
+  };
+
+  const CAT_DESC = {
+    Recording:  "Studio time, session musicians, and equipment rental.",
+    Mixing:     "Balancing tracks, EQ, compression, and spatial effects.",
+    Mastering:  "Final polish and loudness optimization for streaming platforms.",
+    Production: "Arrangement, beat production, and creative direction.",
+  };
+
+  // Track the user's current selections
+  let selectedProject = null;
+  let selectedTier    = null;
+
+  // ── Build Step 1 grid (project type buttons) ──
+  function buildProjectGrid() {
+    const grid = document.getElementById("projectGrid");
+    Object.entries(PROJECT_DATA).forEach(([key, p]) => {
+      const btn = document.createElement("button");
+      btn.className = "opt-btn";
+      btn.dataset.key = key;
+      btn.innerHTML = `<span class="opt-title">${p.label}</span><span class="opt-sub">${p.sub}</span><span class="opt-sub">$${p.total.toLocaleString()}</span>`;
+      btn.onclick = () => selectProject(key, btn);
+      grid.appendChild(btn);
+    });
+  }
+
+  // ── Build Step 2 grid (tier buttons) ──
+  function buildTierGrid() {
+    const grid = document.getElementById("tierGrid");
+    Object.entries(TIER_DATA).forEach(([key, t]) => {
+      const btn = document.createElement("button");
+      btn.className = `opt-btn ${t.cls}`;
+      btn.dataset.key = key;
+      btn.innerHTML = `<span class="opt-title">${t.label}</span><span class="opt-sub">${t.sub}</span><span class="opt-sub">×${t.multiplier}</span>`;
+      btn.onclick = () => selectTier(key, btn);
+      grid.appendChild(btn);
+    });
+  }
+
+  // Handle project type selection — highlight chosen button, update hint
+  function selectProject(key, btn) {
+    document.querySelectorAll("#projectGrid .opt-btn").forEach(b => b.classList.remove("selected"));
+    btn.classList.add("selected");
+    selectedProject = key;
+    updateHint();
+  }
+
+  // Handle tier selection — highlight chosen button, update hint
+  function selectTier(key, btn) {
+    document.querySelectorAll("#tierGrid .opt-btn").forEach(b => b.classList.remove("selected"));
+    btn.classList.add("selected");
+    selectedTier = key;
+    updateHint();
+  }
+
+  // Show the recommended budget in the hint line once both selections are made
+  function updateHint() {
+    if (!selectedProject || !selectedTier) return;
+    const rec = PROJECT_DATA[selectedProject].total * TIER_DATA[selectedTier].multiplier;
+    document.getElementById("recommendedHint").textContent =
+      `Recommended for this selection: $${rec.toLocaleString("en-US", { minimumFractionDigits: 2 })}`;
+  }
+
+  // Calculate dollar amounts for every production category using the tier multiplier
+  function calculateBudget(project, tier) {
+    const multiplier      = tier.multiplier;
+    const recommendedTotal = project.total * multiplier;
+
+    return Object.entries(project.costs).map(([name, baseline]) => {
+      const amount  = Math.round(baseline * multiplier * 100) / 100;
+      const percent = amount / recommendedTotal;
+      return { name, amount, percent, description: CAT_DESC[name], colors: CAT_COLORS[name] };
+    });
+  }
+
+  // Build and inject a category card into a container element
+  function renderCard(container, item, barMaxAmount) {
+    const barPct   = Math.min((item.amount / barMaxAmount) * 100, 100);
+    const gradient = `linear-gradient(90deg, ${item.colors[0]}, ${item.colors[1]})`;
+    const card     = document.createElement("div");
+    card.className = "cat-card" + (item.mktg ? " mktg-card" : "");
+    card.innerHTML = `
+      <div class="cat-header">
+        <span class="cat-name">${item.name}</span>
+        <span class="cat-amount ${item.mktg ? "mktg-range" : ""}">${item.amountLabel}</span>
+      </div>
+      <div class="bar-wrap">
+        <div class="bar-fill" style="width:0%;background:${gradient}" data-target="${barPct}"></div>
+      </div>
+      <div class="cat-meta">
+        <span class="cat-desc">${item.description}</span>
+        <span class="cat-pct">${item.pctLabel}</span>
+      </div>`;
+    container.appendChild(card);
+  }
+
+  // Animate all progress bars after the DOM paints
+  function animateBars() {
+    requestAnimationFrame(() => {
+      document.querySelectorAll(".bar-fill").forEach(bar => {
+        bar.style.width = bar.dataset.target + "%";
+      });
+    });
+  }
+
+  // Main calculate function — validates selections, builds results, shows warnings
+  function calculate() {
+    // Hide all alerts
+    ["alertError","alertWarn","alertSuccess"].forEach(id =>
+      document.getElementById(id).style.display = "none"
+    );
+
+    if (!selectedProject || !selectedTier) {
+      document.getElementById("alertError").style.display = "flex";
+      return;
+    }
+
+    const project = PROJECT_DATA[selectedProject];
+    const tier    = TIER_DATA[selectedTier];
+
+    const recommendedTotal = project.total * tier.multiplier;
+    const rawInput         = parseFloat(document.getElementById("budgetInput").value);
+    const userBudget       = (rawInput > 0) ? rawInput : recommendedTotal;
+
+    // ── Production breakdown ──
+    const breakdown = calculateBudget(project, tier);
+    const prodTotal = breakdown.reduce((s, i) => s + i.amount, 0);
+    const barMax    = Math.max(...breakdown.map(i => i.amount));
+
+    const catContainer = document.getElementById("categoriesContainer");
+    catContainer.innerHTML = "";
+    breakdown.forEach(item => {
+      renderCard(catContainer, {
+        ...item,
+        amountLabel: "$" + item.amount.toLocaleString("en-US", { minimumFractionDigits: 2 }),
+        pctLabel:    (item.percent * 100).toFixed(0) + "%",
+      }, barMax);
+    });
+
+    // ── Marketing estimates ──
+    const mktgContainer = document.getElementById("marketingContainer");
+    mktgContainer.innerHTML = "";
+    let mktgMin = 0, mktgMax = 0;
+    MARKETING_ESTIMATES.forEach(item => {
+      const [lo, hi] = item.range;
+      mktgMin += lo; mktgMax += hi;
+      renderCard(mktgContainer, {
+        name:        item.name,
+        amount:      hi,       // used only for bar scaling
+        colors:      item.colors,
+        description: item.desc + " · " + item.unit,
+        amountLabel: `$${lo.toLocaleString()} – $${hi.toLocaleString()}`,
+        pctLabel:    item.unit,
+        mktg:        true,
+      }, 5000);                // scale marketing bars against $5k max
+    });
+
+    // ── Populate summary cells ──
+    const fmt = n => "$" + n.toLocaleString("en-US", { minimumFractionDigits: 2 });
+    document.getElementById("yourBudgetDisplay").textContent  = fmt(userBudget);
+    document.getElementById("recommendedDisplay").textContent = fmt(recommendedTotal);
+    document.getElementById("projectTierLabel").textContent   = `${project.label} · ${tier.label}`;
+    document.getElementById("tierLabel").textContent          = `${tier.label} tier (×${tier.multiplier})`;
+
+    document.getElementById("grandMin").textContent = fmt(prodTotal + mktgMin);
+    document.getElementById("grandMax").textContent = fmt(prodTotal + mktgMax);
+
+    // ── Smart warnings ──
+    if (userBudget < recommendedTotal * 0.70) {
+      document.getElementById("alertWarn").style.display = "flex";
+    } else if (userBudget > recommendedTotal) {
+      document.getElementById("alertSuccess").style.display = "flex";
+    }
+
+    document.getElementById("results").style.display = "block";
+    document.getElementById("againRow").style.display = "flex";
+    document.getElementById("exitMsg").style.display  = "none";
+
+    animateBars();
+  }
+
+  // Reset — clear all selections and results for a new calculation
+  function resetAll() {
+    selectedProject = null;
+    selectedTier    = null;
+    document.querySelectorAll(".opt-btn").forEach(b => b.classList.remove("selected"));
+    document.getElementById("budgetInput").value = "";
+    document.getElementById("results").style.display = "none";
+    document.getElementById("againRow").style.display = "none";
+    document.getElementById("recommendedHint").textContent = "← Select a project type and tier to see the recommended budget";
+    ["alertError","alertWarn","alertSuccess"].forEach(id =>
+      document.getElementById(id).style.display = "none"
+    );
+  }
+
+  // Exit — show farewell message and hide action buttons
+  function exitApp() {
+    document.getElementById("againRow").style.display = "none";
+    document.getElementById("exitMsg").style.display  = "block";
+  }
+
+  // Allow Enter key to trigger calculation
+  document.getElementById("budgetInput").addEventListener("keydown", e => {
+    if (e.key === "Enter") calculate();
+  });
+
+  // Initialise grids on load
+  buildProjectGrid();
+  buildTierGrid();
+</script>
+</body>
+</html>
