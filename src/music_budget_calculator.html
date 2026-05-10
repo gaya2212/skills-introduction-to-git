@@ -38,6 +38,176 @@
     h1 span { color: #a78bfa; }
     .subtitle { font-size: 0.85rem; color: #7a7a9a; margin-bottom: 2rem; animation: fadeInUp 0.8s ease 0.2s forwards; opacity: 0; }
 
+    /* ── AI Section ── */
+    .ai-section {
+      background: rgba(16,185,129,0.08);
+      border: 2px solid rgba(16,185,129,0.3);
+      border-radius: 14px;
+      padding: 1.6rem;
+      margin-bottom: 2.2rem;
+      animation: fadeInUp 0.6s ease 0.25s forwards;
+      opacity: 0;
+    }
+    
+    .ai-section-title {
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: #6ee7b7;
+      text-transform: uppercase;
+      letter-spacing: 1.2px;
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .ai-section-title::before {
+      content: '✨';
+      font-size: 1.1rem;
+    }
+
+    .ai-section textarea {
+      width: 100%;
+      padding: 1rem;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(16,185,129,0.2);
+      border-radius: 10px;
+      color: #fff;
+      font-size: 0.95rem;
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      resize: vertical;
+      min-height: 110px;
+      outline: none;
+      transition: all 0.2s ease;
+      margin-bottom: 1rem;
+    }
+
+    .ai-section textarea:focus {
+      border-color: #6ee7b7;
+      background: rgba(255,255,255,0.06);
+      box-shadow: 0 0 0 3px rgba(110,231,183,0.12);
+    }
+
+    .ai-section textarea::placeholder {
+      color: #555570;
+    }
+
+    .ai-input-row {
+      display: flex;
+      gap: 0.8rem;
+      margin-bottom: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .api-key-input {
+      flex: 1;
+      min-width: 200px;
+      padding: 0.8rem;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(16,185,129,0.2);
+      border-radius: 8px;
+      color: #fff;
+      font-size: 0.9rem;
+      outline: none;
+      transition: all 0.2s ease;
+    }
+
+    .api-key-input:focus {
+      border-color: #6ee7b7;
+      background: rgba(255,255,255,0.06);
+    }
+
+    .api-key-input::placeholder {
+      color: #555570;
+    }
+
+    .btn-ai {
+      padding: 0.8rem 1.6rem;
+      background: linear-gradient(135deg, #10b981, #6ee7b7);
+      border: none;
+      border-radius: 8px;
+      color: #fff;
+      font-size: 0.95rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      position: relative;
+      overflow: hidden;
+      white-space: nowrap;
+    }
+
+    .btn-ai:hover:not(:disabled) {
+      opacity: 0.9;
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(16,185,129,0.35);
+    }
+
+    .btn-ai:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .btn-ai span {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.6rem;
+    }
+
+    .spinner {
+      display: inline-block;
+      width: 1rem;
+      height: 1rem;
+      border: 2px solid rgba(255,255,255,0.3);
+      border-radius: 50%;
+      border-top-color: #fff;
+      animation: spin 0.8s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .ai-help-text {
+      font-size: 0.75rem;
+      color: #5a5a7a;
+      line-height: 1.5;
+      margin-top: 0.8rem;
+    }
+
+    .ai-help-text a {
+      color: #6ee7b7;
+      text-decoration: none;
+      font-weight: 600;
+    }
+
+    .ai-help-text a:hover {
+      text-decoration: underline;
+    }
+
+    .divider-ai {
+      display: flex;
+      align-items: center;
+      gap: 1.2rem;
+      margin: 2rem 0;
+      font-size: 0.8rem;
+      color: #5a5a7a;
+      text-transform: uppercase;
+      font-weight: 600;
+      letter-spacing: 1px;
+      animation: fadeInUp 0.6s ease 0.30s forwards;
+      opacity: 0;
+    }
+
+    .divider-ai::before,
+    .divider-ai::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: rgba(255,255,255,0.08);
+    }
+
     /* ── Step labels ── */
     .step-label {
       font-size: 0.72rem;
@@ -49,9 +219,9 @@
       animation: fadeInUp 0.6s ease forwards;
       opacity: 0;
     }
-    .step-label:nth-of-type(1) { animation-delay: 0.3s; }
-    .step-label:nth-of-type(2) { animation-delay: 0.6s; }
-    .step-label:nth-of-type(3) { animation-delay: 0.9s; }
+    .step-label:nth-of-type(1) { animation-delay: 0.35s; }
+    .step-label:nth-of-type(2) { animation-delay: 0.65s; }
+    .step-label:nth-of-type(3) { animation-delay: 0.95s; }
 
     /* ── Option grid (project type & tier) ── */
     .option-grid {
@@ -77,13 +247,13 @@
       animation: fadeInUp 0.5s ease forwards;
       opacity: 0;
     }
-    .option-grid.cols-4 .opt-btn:nth-child(1) { animation-delay: 0.35s; }
-    .option-grid.cols-4 .opt-btn:nth-child(2) { animation-delay: 0.40s; }
-    .option-grid.cols-4 .opt-btn:nth-child(3) { animation-delay: 0.45s; }
-    .option-grid.cols-4 .opt-btn:nth-child(4) { animation-delay: 0.50s; }
-    .option-grid.cols-3 .opt-btn:nth-child(1) { animation-delay: 0.65s; }
-    .option-grid.cols-3 .opt-btn:nth-child(2) { animation-delay: 0.70s; }
-    .option-grid.cols-3 .opt-btn:nth-child(3) { animation-delay: 0.75s; }
+    .option-grid.cols-4 .opt-btn:nth-child(1) { animation-delay: 0.40s; }
+    .option-grid.cols-4 .opt-btn:nth-child(2) { animation-delay: 0.45s; }
+    .option-grid.cols-4 .opt-btn:nth-child(3) { animation-delay: 0.50s; }
+    .option-grid.cols-4 .opt-btn:nth-child(4) { animation-delay: 0.55s; }
+    .option-grid.cols-3 .opt-btn:nth-child(1) { animation-delay: 0.70s; }
+    .option-grid.cols-3 .opt-btn:nth-child(2) { animation-delay: 0.75s; }
+    .option-grid.cols-3 .opt-btn:nth-child(3) { animation-delay: 0.80s; }
     .opt-btn .opt-title { font-size: 0.88rem; font-weight: 700; color: #e0e0f4; display: block; margin-bottom: 0.2rem; }
     .opt-btn .opt-sub   { font-size: 0.72rem; color: #6a6a8a; }
     .opt-btn:hover { 
@@ -111,14 +281,14 @@
       display: flex; 
       gap: 0.6rem; 
       margin-bottom: 0.5rem;
-      animation: fadeInUp 0.6s ease 0.85s forwards;
+      animation: fadeInUp 0.6s ease 0.90s forwards;
       opacity: 0;
     }
     .input-hint { 
       font-size: 0.76rem; 
       color: #5a5a7a; 
       margin-bottom: 1.4rem;
-      animation: fadeInUp 0.6s ease 0.90s forwards;
+      animation: fadeInUp 0.6s ease 0.95s forwards;
       opacity: 0;
     }
 
@@ -362,6 +532,8 @@
       .card { padding: 1.6rem 1.2rem; }
       .option-grid.cols-4 { grid-template-columns: repeat(2, 1fr); }
       .total-banner, .grand-total-row { grid-template-columns: 1fr; }
+      .ai-input-row { flex-direction: column; }
+      .btn-ai { width: 100%; }
     }
   </style>
 </head>
@@ -369,6 +541,32 @@
 <div class="card">
   <h1>🎚 Music <span>Budget</span> Calculator</h1>
   <p class="subtitle">Real industry cost data · three steps · instant breakdown</p>
+
+  <!-- ── AI SECTION ── -->
+  <div class="ai-section">
+    <div class="ai-section-title">Describe Your Project</div>
+    <textarea id="projectDescription" placeholder="E.g., I'm recording a hip-hop album with 12 tracks in a professional studio with live musicians. I want high-quality production and premium mastering for streaming platforms."></textarea>
+    
+    <div class="ai-input-row">
+      <input 
+        type="password" 
+        id="apiKey" 
+        class="api-key-input" 
+        placeholder="Paste your Google Gemini API key here"
+      />
+      <button class="btn-ai" id="analyzeBtn" onclick="analyzeWithAI()">
+        <span><span class="spinner" id="spinner" style="display:none;"></span>Analyze with AI</span>
+      </button>
+    </div>
+
+    <div class="ai-help-text">
+      <strong>Don't have an API key?</strong> Get a free Google Gemini API key in 30 seconds: 
+      <a href="https://makersuite.google.com/app/apikey" target="_blank">makersuite.google.com/app/apikey</a>
+      Your key is never sent to our server—all analysis happens in your browser.
+    </div>
+  </div>
+
+  <div class="divider-ai">Or Fill In Manually</div>
 
   <!-- ── Step 1: Project type ── -->
   <div class="step-label">Step 1 — Project Type</div>
@@ -393,11 +591,10 @@
   <div id="alertError"   class="alert error">  ⚠ Please select a project type and tier first.</div>
   <div id="alertWarn"    class="alert warn">   ⚠ Warning: Your budget is significantly below the industry average for this project type. Quality may be compromised.</div>
   <div id="alertSuccess" class="alert success"> ✓ You have headroom in your budget. Consider investing the extra in marketing and promotion.</div>
+  <div id="alertAI"      class="alert error"   style="display:none;"></div>
 
   <!-- ── Results ── -->
   <div id="results">
-
-    <!-- Summary banner -->
     <div class="total-banner">
       <div class="total-cell highlight">
         <div class="tc-label">Your Budget</div>
@@ -411,15 +608,12 @@
       </div>
     </div>
 
-    <!-- Production breakdown -->
     <div class="section-header">🎛 Production Breakdown</div>
     <div class="categories" id="categoriesContainer"></div>
 
-    <!-- Marketing estimates -->
     <div class="section-header">📣 Marketing & Distribution Estimates</div>
     <div class="categories" id="marketingContainer"></div>
 
-    <!-- Grand totals -->
     <div class="section-header">💰 Grand Total</div>
     <div class="grand-total-row">
       <div class="gt-cell">
@@ -446,6 +640,101 @@
 </div>
 
 <script>
+  // ── AI Analysis Function ──
+  async function analyzeWithAI() {
+    const projectDesc = document.getElementById("projectDescription").value.trim();
+    const apiKey = document.getElementById("apiKey").value.trim();
+    const analyzeBtn = document.getElementById("analyzeBtn");
+    const spinner = document.getElementById("spinner");
+
+    if (!projectDesc) {
+      showAIAlert("Please describe your music project first.", "error");
+      return;
+    }
+
+    if (!apiKey) {
+      showAIAlert("Please paste your Google Gemini API key.", "error");
+      return;
+    }
+
+    analyzeBtn.disabled = true;
+    spinner.style.display = "inline-block";
+
+    try {
+      const prompt = `You are a music production budget expert. Analyze this project description and determine:
+1. Project type: single (1 track), demo (3 tracks), ep (5 tracks), or lp (10 tracks)
+2. Budget tier: budget (home studio, 0.5×), standard (mid-level, 1.0×), or premium (high-end, 2.5×)
+3. Optional suggested budget if they mention a specific amount
+
+Project: "${projectDesc}"
+
+IMPORTANT: Respond ONLY with a JSON object (no markdown, no explanation):
+{
+  "projectType": "single|demo|ep|lp",
+  "tier": "budget|standard|premium",
+  "suggestedBudget": null or a number
+}`;
+
+      const response = await fetch(
+        "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=" + apiKey,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            contents: [{ parts: [{ text: prompt }] }],
+            generationConfig: { temperature: 0.7, maxOutputTokens: 200 }
+          })
+        }
+      );
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error?.message || "API request failed");
+      }
+
+      const data = await response.json();
+      const content = data.contents?.[0]?.parts?.[0]?.text;
+
+      if (!content) {
+        throw new Error("No response from AI");
+      }
+
+      const result = JSON.parse(content);
+
+      const projectBtn = document.querySelector(`#projectGrid .opt-btn[data-key="${result.projectType}"]`);
+      if (projectBtn) {
+        selectProject(result.projectType, projectBtn);
+      }
+
+      const tierBtn = document.querySelector(`#tierGrid .opt-btn[data-key="${result.tier}"]`);
+      if (tierBtn) {
+        selectTier(result.tier, tierBtn);
+      }
+
+      if (result.suggestedBudget) {
+        document.getElementById("budgetInput").value = Math.round(result.suggestedBudget);
+      }
+
+      showAIAlert(`✨ AI selected: ${result.projectType.toUpperCase()} · ${result.tier.toUpperCase()} tier`, "success");
+
+      setTimeout(() => calculate(), 500);
+
+    } catch (error) {
+      showAIAlert("Error: " + error.message, "error");
+    } finally {
+      analyzeBtn.disabled = false;
+      spinner.style.display = "none";
+    }
+  }
+
+  function showAIAlert(message, type) {
+    const alertEl = document.getElementById("alertAI");
+    alertEl.textContent = message;
+    alertEl.className = `alert ${type}`;
+    alertEl.style.display = "flex";
+    setTimeout(() => { alertEl.style.display = "none"; }, 5000);
+  }
+
   // ── Master cost data (easy to update — mirrors the Python dict exactly) ──
   const PROJECT_DATA = {
     single:  { label: "Single",  sub: "1 track",   total: 3750,  costs: { Recording: 750,  Mixing: 1200, Mastering: 400,  Production: 1400 } },
@@ -665,7 +954,7 @@
     document.getElementById("results").style.display = "none";
     document.getElementById("againRow").style.display = "none";
     document.getElementById("recommendedHint").textContent = "← Select a project type and tier to see the recommended budget";
-    ["alertError","alertWarn","alertSuccess"].forEach(id =>
+    ["alertError","alertWarn","alertSuccess","alertAI"].forEach(id =>
       document.getElementById(id).style.display = "none"
     );
   }
@@ -679,6 +968,10 @@
   // Allow Enter key to trigger calculation
   document.getElementById("budgetInput").addEventListener("keydown", e => {
     if (e.key === "Enter") calculate();
+  });
+
+  document.getElementById("projectDescription").addEventListener("keydown", e => {
+    if (e.key === "Enter" && e.ctrlKey) analyzeWithAI();
   });
 
   // Initialise grids on load
