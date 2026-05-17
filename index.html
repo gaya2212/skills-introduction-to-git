@@ -3,15 +3,103 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Music Budget Calculator</title>
-  <meta http-equiv="refresh" content="0; url=./src/music_budget_calculator.html" />
-  <script>
-    // Fallback redirect for hosts that ignore meta refresh.
-    window.location.replace("./src/music_budget_calculator.html");
-  </script>
+  <title>🎵 Musion – Music Project Tools</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      min-height: 100vh;
+      background: #0d0d14;
+      background-image:
+        radial-gradient(ellipse 80% 50% at 20% 10%, rgba(99,60,180,0.18) 0%, transparent 60%),
+        radial-gradient(ellipse 60% 40% at 80% 80%, rgba(0,180,160,0.12) 0%, transparent 60%);
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      color: #e8e8f0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 3rem 1.5rem;
+      gap: 2rem;
+    }
+    .hero { text-align: center; }
+    .hero-logo { font-size: 3.5rem; }
+    .hero h1 { font-size: 2.4rem; font-weight: 800; color: #fff; margin-top: 0.4rem; }
+    .hero h1 span { color: #a78bfa; }
+    .hero p { color: #7a7a9a; margin-top: 0.5rem; font-size: 1rem; }
+    .card-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 1.2rem;
+      width: 100%;
+      max-width: 760px;
+    }
+    .tool-card {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.09);
+      border-radius: 20px;
+      padding: 2rem 1.6rem;
+      text-align: center;
+      text-decoration: none;
+      color: inherit;
+      transition: transform 0.22s ease, box-shadow 0.22s ease, border-color 0.22s;
+      animation: fadeUp 0.6s ease forwards;
+      opacity: 0;
+    }
+    .tool-card:nth-child(1) { animation-delay: 0.1s; }
+    .tool-card:nth-child(2) { animation-delay: 0.2s; }
+    .tool-card:nth-child(3) { animation-delay: 0.3s; }
+    .tool-card:hover { transform: translateY(-6px); box-shadow: 0 20px 48px rgba(0,0,0,0.45); border-color: rgba(167,139,250,0.4); }
+    .tool-card .icon { font-size: 2.6rem; margin-bottom: 0.8rem; }
+    .tool-card h2 { font-size: 1.1rem; font-weight: 700; color: #fff; margin-bottom: 0.4rem; }
+    .tool-card p { font-size: 0.82rem; color: #7a7a9a; line-height: 1.5; }
+    .tool-card .badge {
+      display: inline-block;
+      margin-top: 1.2rem;
+      padding: 0.35rem 1rem;
+      border-radius: 999px;
+      font-size: 0.76rem;
+      font-weight: 600;
+    }
+    .badge-purple { background: rgba(167,139,250,0.15); color: #c4b5fd; border: 1px solid rgba(167,139,250,0.3); }
+    .badge-green  { background: rgba(16,185,129,0.12);  color: #6ee7b7;  border: 1px solid rgba(16,185,129,0.3); }
+    .badge-orange { background: rgba(244,135,113,0.12); color: #f48771;  border: 1px solid rgba(244,135,113,0.3); }
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    footer { font-size: 0.75rem; color: #44445a; margin-top: 1rem; }
+  </style>
 </head>
 <body>
-  <p>Redirecting to the Music Budget Calculator...</p>
-  <p><a href="./src/music_budget_calculator.html">Open calculator</a></p>
+  <div class="hero">
+    <div class="hero-logo">🎵</div>
+    <h1>Mu<span>sion</span></h1>
+    <p>Your music project toolkit — plan, budget, and create.</p>
+  </div>
+
+  <div class="card-grid">
+    <a class="tool-card" href="./src/music_project_wizard.html">
+      <div class="icon">🪄</div>
+      <h2>Project Wizard</h2>
+      <p>Step-by-step guide to plan your next EP, album, or single from start to release.</p>
+      <span class="badge badge-purple">Start Planning →</span>
+    </a>
+
+    <a class="tool-card" href="./src/music_budget_calculator.html">
+      <div class="icon">💰</div>
+      <h2>Budget Calculator</h2>
+      <p>Estimate costs for recording, mixing, mastering, and distribution with AI assistance.</p>
+      <span class="badge badge-green">Open Calculator →</span>
+    </a>
+
+    <a class="tool-card" href="./src/index.html">
+      <div class="icon">🧱</div>
+      <h2>Stack Overflown</h2>
+      <p>A dev-themed puzzle game. Match the error patterns before your stack overflows!</p>
+      <span class="badge badge-orange">Play Game →</span>
+    </a>
+  </div>
+
+  <footer>Musion — Built for music creators</footer>
 </body>
 </html>

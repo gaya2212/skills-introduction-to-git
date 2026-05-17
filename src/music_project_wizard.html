@@ -1,0 +1,1299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>🎵 Music Project Wizard</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --purple: #a78bfa;
+      --purple-dim: rgba(167,139,250,0.15);
+      --green: #10b981;
+      --green-light: #6ee7b7;
+      --blue: #38bdf8;
+      --gold: #f59e0b;
+      --bg: #0d0d14;
+      --surface: rgba(255,255,255,0.04);
+      --border: rgba(255,255,255,0.09);
+      --text: #e8e8f0;
+      --muted: #7a7a9a;
+      --dim: #5a5a7a;
+    }
+
+    body {
+      min-height: 100vh;
+      background: var(--bg);
+      background-image:
+        radial-gradient(ellipse 80% 50% at 20% 10%, rgba(99,60,180,0.18) 0%, transparent 60%),
+        radial-gradient(ellipse 60% 40% at 80% 80%, rgba(0,180,160,0.12) 0%, transparent 60%);
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      color: var(--text);
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+      padding: 2.5rem 1rem 4rem;
+    }
+
+    /* ── Card ── */
+    .wizard-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      padding: 2.5rem 2.8rem;
+      width: 100%;
+      max-width: 680px;
+      backdrop-filter: blur(14px);
+      box-shadow: 0 24px 64px rgba(0,0,0,0.55);
+      animation: slideIn 0.7s cubic-bezier(0.34,1.56,0.64,1) forwards;
+      opacity: 0;
+    }
+
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateY(32px) scale(0.97); }
+      to   { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(16px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to   { opacity: 1; }
+    }
+
+    /* ── Header ── */
+    .wizard-header {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+
+    .wizard-logo {
+      font-size: 2.8rem;
+      line-height: 1;
+      margin-bottom: 0.6rem;
+    }
+
+    .wizard-title {
+      font-size: 1.7rem;
+      font-weight: 800;
+      color: #fff;
+      letter-spacing: -0.4px;
+    }
+
+    .wizard-title span { color: var(--purple); }
+
+    .wizard-subtitle {
+      font-size: 0.85rem;
+      color: var(--muted);
+      margin-top: 0.3rem;
+    }
+
+    /* ── Progress bar ── */
+    .progress-wrap {
+      margin-bottom: 2.2rem;
+    }
+
+    .progress-steps {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 0.8rem;
+      position: relative;
+    }
+
+    .progress-steps::before {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: var(--border);
+      transform: translateY(-50%);
+      z-index: 0;
+    }
+
+    .progress-line {
+      position: absolute;
+      top: 50%;
+      left: 0;
+      height: 2px;
+      background: linear-gradient(90deg, var(--purple), var(--green-light));
+      transform: translateY(-50%);
+      z-index: 1;
+      transition: width 0.4s ease;
+    }
+
+    .step-dot {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: var(--bg);
+      border: 2px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.78rem;
+      font-weight: 700;
+      color: var(--muted);
+      position: relative;
+      z-index: 2;
+      transition: all 0.3s ease;
+      cursor: default;
+    }
+
+    .step-dot.active {
+      border-color: var(--purple);
+      background: var(--purple-dim);
+      color: var(--purple);
+      box-shadow: 0 0 0 4px rgba(167,139,250,0.15);
+    }
+
+    .step-dot.done {
+      border-color: var(--green);
+      background: rgba(16,185,129,0.15);
+      color: var(--green-light);
+    }
+
+    .step-dot.done::after {
+      content: '✓';
+      font-size: 0.85rem;
+    }
+
+    .step-labels {
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .step-lbl {
+      font-size: 0.65rem;
+      color: var(--dim);
+      text-align: center;
+      width: 32px;
+      transition: color 0.3s;
+    }
+
+    .step-lbl.active { color: var(--purple); font-weight: 600; }
+    .step-lbl.done   { color: var(--green-light); }
+
+    /* ── Steps ── */
+    .step {
+      display: none;
+      animation: fadeUp 0.4s ease forwards;
+    }
+
+    .step.active { display: block; }
+
+    .step-heading {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 0.3rem;
+    }
+
+    .step-desc {
+      font-size: 0.83rem;
+      color: var(--muted);
+      margin-bottom: 1.8rem;
+    }
+
+    /* ── Form elements ── */
+    .field-label {
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 1.1px;
+      color: var(--purple);
+      margin-bottom: 0.5rem;
+      display: block;
+    }
+
+    .field-group { margin-bottom: 1.5rem; }
+
+    input[type="text"],
+    input[type="date"],
+    input[type="number"],
+    input[type="email"],
+    select,
+    textarea {
+      width: 100%;
+      padding: 0.85rem 1rem;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      color: #fff;
+      font-size: 0.95rem;
+      font-family: inherit;
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
+    }
+
+    input:focus, select:focus, textarea:focus {
+      border-color: var(--purple);
+      background: rgba(255,255,255,0.06);
+      box-shadow: 0 0 0 3px rgba(167,139,250,0.15);
+    }
+
+    input::placeholder, textarea::placeholder { color: var(--dim); }
+    select option { background: #1a1a2e; }
+
+    .input-row-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+    }
+
+    /* ── Chip grids ── */
+    .chip-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin-top: 0.4rem;
+    }
+
+    .chip {
+      padding: 0.45rem 1rem;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid var(--border);
+      color: #c4c4e0;
+      font-size: 0.82rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.18s ease;
+      user-select: none;
+    }
+
+    .chip:hover {
+      border-color: var(--purple);
+      background: var(--purple-dim);
+      color: #fff;
+    }
+
+    .chip.selected {
+      border-color: var(--purple);
+      background: rgba(167,139,250,0.2);
+      color: #c4b5fd;
+      box-shadow: 0 0 0 2px rgba(167,139,250,0.2);
+    }
+
+    .chip.genre-chip.selected { border-color: var(--purple); background: rgba(167,139,250,0.2); }
+    .chip.mood-chip.selected  { border-color: #f472b6; background: rgba(244,114,182,0.15); color: #f9a8d4; }
+    .chip.inst-chip.selected  { border-color: var(--blue); background: rgba(56,189,248,0.12); color: #7dd3fc; }
+    .chip.plat-chip.selected  { border-color: var(--green); background: rgba(16,185,129,0.12); color: var(--green-light); }
+    .chip.dist-chip.selected  { border-color: var(--gold); background: rgba(245,158,11,0.12); color: #fcd34d; }
+
+    /* ── Range slider ── */
+    .range-wrap {
+      position: relative;
+      padding: 0.5rem 0;
+    }
+
+    input[type="range"] {
+      -webkit-appearance: none;
+      width: 100%;
+      height: 6px;
+      border-radius: 3px;
+      background: linear-gradient(90deg, var(--purple) var(--pct, 30%), rgba(255,255,255,0.1) var(--pct, 30%));
+      outline: none;
+      border: none;
+      padding: 0;
+      cursor: pointer;
+    }
+
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: var(--purple);
+      box-shadow: 0 0 0 4px rgba(167,139,250,0.2);
+      cursor: pointer;
+      transition: box-shadow 0.2s;
+    }
+
+    input[type="range"]::-webkit-slider-thumb:hover {
+      box-shadow: 0 0 0 6px rgba(167,139,250,0.3);
+    }
+
+    .range-labels {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.72rem;
+      color: var(--dim);
+      margin-top: 0.4rem;
+    }
+
+    .range-value {
+      text-align: center;
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: var(--purple);
+      margin-top: 0.3rem;
+    }
+
+    /* ── Team member cards ── */
+    .team-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.7rem;
+      margin-bottom: 1rem;
+    }
+
+    .team-member-card {
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 0.7rem 1rem;
+      animation: fadeIn 0.3s ease forwards;
+    }
+
+    .member-avatar {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      background: var(--purple-dim);
+      border: 2px solid var(--purple);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.1rem;
+      flex-shrink: 0;
+    }
+
+    .member-info { flex: 1; }
+
+    .member-name {
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: #fff;
+    }
+
+    .member-role {
+      font-size: 0.75rem;
+      color: var(--muted);
+    }
+
+    .btn-remove {
+      background: none;
+      border: none;
+      color: var(--dim);
+      cursor: pointer;
+      font-size: 1.1rem;
+      padding: 0.2rem;
+      border-radius: 4px;
+      transition: color 0.2s;
+    }
+
+    .btn-remove:hover { color: #f87171; }
+
+    .add-member-row {
+      display: grid;
+      grid-template-columns: 1fr auto auto;
+      gap: 0.6rem;
+      align-items: end;
+    }
+
+    .add-member-row select { padding: 0.7rem 0.8rem; }
+
+    .btn-add-member {
+      padding: 0.7rem 1rem;
+      background: var(--purple-dim);
+      border: 1px solid var(--purple);
+      border-radius: 10px;
+      color: var(--purple);
+      font-weight: 600;
+      font-size: 0.88rem;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: all 0.2s;
+    }
+
+    .btn-add-member:hover {
+      background: rgba(167,139,250,0.25);
+      box-shadow: 0 4px 12px rgba(167,139,250,0.2);
+    }
+
+    /* ── Milestones ── */
+    .milestone-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.6rem;
+      margin-bottom: 1rem;
+    }
+
+    .milestone-item {
+      display: flex;
+      align-items: center;
+      gap: 0.7rem;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 0.65rem 0.9rem;
+      animation: fadeIn 0.3s ease;
+    }
+
+    .milestone-icon { font-size: 1rem; }
+    .milestone-text { flex: 1; font-size: 0.88rem; color: #d0d0e8; }
+    .milestone-date { font-size: 0.75rem; color: var(--muted); }
+
+    /* ── Navigation ── */
+    .nav-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 2.2rem;
+      gap: 1rem;
+    }
+
+    .btn-nav {
+      padding: 0.85rem 2rem;
+      border-radius: 10px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-family: inherit;
+    }
+
+    .btn-prev {
+      background: rgba(255,255,255,0.05);
+      border: 1px solid var(--border);
+      color: var(--muted);
+    }
+
+    .btn-prev:hover { background: rgba(255,255,255,0.08); color: #fff; }
+
+    .btn-next {
+      background: linear-gradient(135deg, var(--purple), #c4b5fd);
+      border: none;
+      color: #fff;
+      flex: 1;
+      max-width: 220px;
+      box-shadow: 0 8px 24px rgba(167,139,250,0.25);
+    }
+
+    .btn-next:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 28px rgba(167,139,250,0.35);
+    }
+
+    .btn-finish {
+      background: linear-gradient(135deg, var(--green), var(--green-light));
+      border: none;
+      color: #fff;
+      flex: 1;
+      max-width: 220px;
+      box-shadow: 0 8px 24px rgba(16,185,129,0.3);
+    }
+
+    .btn-finish:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 28px rgba(16,185,129,0.4);
+    }
+
+    .step-counter {
+      font-size: 0.78rem;
+      color: var(--dim);
+    }
+
+    /* ── Summary ── */
+    #step-summary {
+      animation: fadeUp 0.5s ease forwards;
+    }
+
+    .summary-hero {
+      text-align: center;
+      padding: 1.5rem 0 2rem;
+    }
+
+    .summary-hero .big-emoji { font-size: 3.5rem; }
+
+    .summary-hero h2 {
+      font-size: 1.6rem;
+      font-weight: 800;
+      color: #fff;
+      margin: 0.5rem 0 0.3rem;
+    }
+
+    .summary-hero p { font-size: 0.88rem; color: var(--muted); }
+
+    .summary-grid {
+      display: grid;
+      gap: 1rem;
+      margin-top: 1.5rem;
+    }
+
+    .summary-section {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 1.2rem 1.4rem;
+    }
+
+    .summary-section-title {
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 1.2px;
+      color: var(--purple);
+      font-weight: 700;
+      margin-bottom: 0.9rem;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    .summary-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      padding: 0.35rem 0;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+      gap: 1rem;
+    }
+
+    .summary-row:last-child { border-bottom: none; }
+
+    .summary-key {
+      font-size: 0.8rem;
+      color: var(--muted);
+      flex-shrink: 0;
+    }
+
+    .summary-val {
+      font-size: 0.85rem;
+      color: #e0e0f4;
+      font-weight: 500;
+      text-align: right;
+      word-break: break-word;
+    }
+
+    .tag-list { display: flex; flex-wrap: wrap; gap: 0.35rem; justify-content: flex-end; }
+    .tag {
+      padding: 0.2rem 0.65rem;
+      border-radius: 999px;
+      font-size: 0.75rem;
+      background: var(--purple-dim);
+      color: #c4b5fd;
+      border: 1px solid rgba(167,139,250,0.25);
+    }
+
+    .summary-actions {
+      display: flex;
+      gap: 0.8rem;
+      margin-top: 1.8rem;
+      flex-wrap: wrap;
+    }
+
+    .btn-action {
+      flex: 1;
+      min-width: 140px;
+      padding: 0.85rem 1.2rem;
+      border-radius: 10px;
+      font-size: 0.88rem;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: inherit;
+      transition: all 0.2s;
+      text-align: center;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.4rem;
+    }
+
+    .btn-action.primary {
+      background: linear-gradient(135deg, var(--purple), #c4b5fd);
+      border: none;
+      color: #fff;
+      box-shadow: 0 6px 20px rgba(167,139,250,0.25);
+    }
+
+    .btn-action.primary:hover { transform: translateY(-2px); box-shadow: 0 10px 24px rgba(167,139,250,0.35); }
+
+    .btn-action.secondary {
+      background: rgba(255,255,255,0.05);
+      border: 1px solid var(--border);
+      color: var(--muted);
+    }
+
+    .btn-action.secondary:hover { background: rgba(255,255,255,0.08); color: #fff; }
+
+    .btn-action.green {
+      background: linear-gradient(135deg, var(--green), var(--green-light));
+      border: none;
+      color: #fff;
+      box-shadow: 0 6px 20px rgba(16,185,129,0.25);
+    }
+
+    .btn-action.green:hover { transform: translateY(-2px); box-shadow: 0 10px 24px rgba(16,185,129,0.35); }
+
+    /* ── Validation hint ── */
+    .field-error {
+      font-size: 0.75rem;
+      color: #f87171;
+      margin-top: 0.35rem;
+      display: none;
+    }
+
+    .field-error.show { display: block; }
+
+    /* ── Responsive ── */
+    @media (max-width: 600px) {
+      .wizard-card { padding: 1.8rem 1.4rem; }
+      .input-row-2 { grid-template-columns: 1fr; }
+      .add-member-row { grid-template-columns: 1fr; }
+      .step-dot { width: 26px; height: 26px; font-size: 0.7rem; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="wizard-card">
+
+  <!-- Header -->
+  <div class="wizard-header">
+    <div class="wizard-logo">🎵</div>
+    <h1 class="wizard-title">Music <span>Project</span> Wizard</h1>
+    <p class="wizard-subtitle">Plan your next music project in 5 easy steps</p>
+  </div>
+
+  <!-- Progress -->
+  <div class="progress-wrap">
+    <div class="progress-steps" id="progressSteps">
+      <div class="progress-line" id="progressLine"></div>
+      <div class="step-dot active" data-step="1">1</div>
+      <div class="step-dot" data-step="2">2</div>
+      <div class="step-dot" data-step="3">3</div>
+      <div class="step-dot" data-step="4">4</div>
+      <div class="step-dot" data-step="5">5</div>
+    </div>
+    <div class="step-labels">
+      <span class="step-lbl active">Basics</span>
+      <span class="step-lbl">Production</span>
+      <span class="step-lbl">Team</span>
+      <span class="step-lbl">Release</span>
+      <span class="step-lbl">Budget</span>
+    </div>
+  </div>
+
+  <!-- ─────────────────────────────────── STEP 1 – Project Basics -->
+  <div class="step active" id="step-1">
+    <h2 class="step-heading">Project Basics</h2>
+    <p class="step-desc">Tell us about your music project.</p>
+
+    <div class="field-group">
+      <label class="field-label" for="projectName">Project / Album Name</label>
+      <input type="text" id="projectName" placeholder="e.g. Neon Horizons EP" />
+      <div class="field-error" id="err-projectName">Please enter a project name.</div>
+    </div>
+
+    <div class="field-group">
+      <label class="field-label">Genre</label>
+      <div class="chip-grid" id="genreChips">
+        <span class="chip genre-chip" data-value="Pop">🎤 Pop</span>
+        <span class="chip genre-chip" data-value="Hip-Hop">🎧 Hip-Hop</span>
+        <span class="chip genre-chip" data-value="R&amp;B">🎶 R&amp;B</span>
+        <span class="chip genre-chip" data-value="Electronic">⚡ Electronic</span>
+        <span class="chip genre-chip" data-value="Rock">🎸 Rock</span>
+        <span class="chip genre-chip" data-value="Jazz">🎷 Jazz</span>
+        <span class="chip genre-chip" data-value="Classical">🎻 Classical</span>
+        <span class="chip genre-chip" data-value="Country">🤠 Country</span>
+        <span class="chip genre-chip" data-value="Latin">💃 Latin</span>
+        <span class="chip genre-chip" data-value="Other">✨ Other</span>
+      </div>
+      <div class="field-error" id="err-genre">Please select at least one genre.</div>
+    </div>
+
+    <div class="field-group">
+      <label class="field-label">Mood / Vibe <span style="color:var(--dim);font-weight:400;text-transform:none;letter-spacing:0">(choose all that apply)</span></label>
+      <div class="chip-grid" id="moodChips">
+        <span class="chip mood-chip" data-value="Energetic">⚡ Energetic</span>
+        <span class="chip mood-chip" data-value="Chill">🌊 Chill</span>
+        <span class="chip mood-chip" data-value="Dark">🌑 Dark</span>
+        <span class="chip mood-chip" data-value="Uplifting">☀️ Uplifting</span>
+        <span class="chip mood-chip" data-value="Romantic">💜 Romantic</span>
+        <span class="chip mood-chip" data-value="Nostalgic">🕰️ Nostalgic</span>
+        <span class="chip mood-chip" data-value="Aggressive">🔥 Aggressive</span>
+        <span class="chip mood-chip" data-value="Dreamy">🌙 Dreamy</span>
+        <span class="chip mood-chip" data-value="Experimental">🔬 Experimental</span>
+      </div>
+    </div>
+
+    <div class="field-group">
+      <label class="field-label" for="releaseDate">Target Release Date</label>
+      <input type="date" id="releaseDate" />
+    </div>
+  </div>
+
+  <!-- ─────────────────────────────────── STEP 2 – Production Details -->
+  <div class="step" id="step-2">
+    <h2 class="step-heading">Production Details</h2>
+    <p class="step-desc">Tell us about the musical content and production approach.</p>
+
+    <div class="field-group">
+      <div class="input-row-2">
+        <div>
+          <label class="field-label" for="trackCount">Number of Tracks</label>
+          <input type="number" id="trackCount" placeholder="e.g. 6" min="1" max="100" />
+        </div>
+        <div>
+          <label class="field-label" for="avgDuration">Avg. Track Length (min)</label>
+          <input type="number" id="avgDuration" placeholder="e.g. 3.5" min="0.5" max="30" step="0.5" />
+        </div>
+      </div>
+    </div>
+
+    <div class="field-group">
+      <label class="field-label">Instruments / Elements</label>
+      <div class="chip-grid" id="instChips">
+        <span class="chip inst-chip" data-value="Vocals">🎤 Vocals</span>
+        <span class="chip inst-chip" data-value="Guitar">🎸 Guitar</span>
+        <span class="chip inst-chip" data-value="Bass">🎸 Bass</span>
+        <span class="chip inst-chip" data-value="Drums">🥁 Drums</span>
+        <span class="chip inst-chip" data-value="Piano">🎹 Piano</span>
+        <span class="chip inst-chip" data-value="Synthesizer">🎛️ Synth</span>
+        <span class="chip inst-chip" data-value="Strings">🎻 Strings</span>
+        <span class="chip inst-chip" data-value="Brass">🎺 Brass</span>
+        <span class="chip inst-chip" data-value="Samples">💾 Samples</span>
+        <span class="chip inst-chip" data-value="Live Drums">🥁 Live Drums</span>
+        <span class="chip inst-chip" data-value="808s">🔊 808s</span>
+        <span class="chip inst-chip" data-value="Choir">🎶 Choir</span>
+      </div>
+    </div>
+
+    <div class="field-group">
+      <label class="field-label">Mixing &amp; Mastering</label>
+      <div class="chip-grid" id="mixChips">
+        <span class="chip" data-value="DIY" data-group="mix">🎧 DIY (self-mixed)</span>
+        <span class="chip" data-value="Hire Online" data-group="mix">💻 Hire Online Engineer</span>
+        <span class="chip" data-value="Professional Studio" data-group="mix">🏢 Professional Studio</span>
+      </div>
+      <div class="field-error" id="err-mix">Please select a mixing option.</div>
+    </div>
+
+    <div class="field-group">
+      <label class="field-label">Recording Setup</label>
+      <div class="chip-grid" id="recChips">
+        <span class="chip" data-value="Home Studio" data-group="rec">🏠 Home Studio</span>
+        <span class="chip" data-value="Professional Studio" data-group="rec">🏢 Professional Studio</span>
+        <span class="chip" data-value="Remote/Online" data-group="rec">🌐 Remote / Online</span>
+        <span class="chip" data-value="Hybrid" data-group="rec">🔀 Hybrid</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─────────────────────────────────── STEP 3 – Team -->
+  <div class="step" id="step-3">
+    <h2 class="step-heading">Your Team</h2>
+    <p class="step-desc">Add the people involved in this project.</p>
+
+    <div class="team-list" id="teamList"></div>
+
+    <div class="add-member-row">
+      <input type="text" id="memberName" placeholder="Name or handle" />
+      <select id="memberRole">
+        <option value="">Role…</option>
+        <option value="🎵 Producer">🎵 Producer</option>
+        <option value="🎤 Vocalist">🎤 Vocalist</option>
+        <option value="🎸 Guitarist">🎸 Guitarist</option>
+        <option value="🎹 Pianist">🎹 Pianist</option>
+        <option value="🥁 Drummer">🥁 Drummer</option>
+        <option value="🎷 Saxophonist">🎷 Saxophonist</option>
+        <option value="🔊 Audio Engineer">🔊 Audio Engineer</option>
+        <option value="🎨 Cover Artist">🎨 Cover Artist</option>
+        <option value="📹 Videographer">📹 Videographer</option>
+        <option value="📱 Social Media">📱 Social Media</option>
+        <option value="💼 Manager">💼 Manager</option>
+        <option value="✨ Collaborator">✨ Collaborator</option>
+      </select>
+      <button class="btn-add-member" onclick="addMember()">+ Add</button>
+    </div>
+    <div class="field-error" id="err-member" style="margin-top:0.5rem"></div>
+
+    <p style="font-size:0.78rem;color:var(--dim);margin-top:1rem">You can add yourself and any collaborators, engineers, or other contributors.</p>
+  </div>
+
+  <!-- ─────────────────────────────────── STEP 4 – Distribution & Platforms -->
+  <div class="step" id="step-4">
+    <h2 class="step-heading">Release &amp; Distribution</h2>
+    <p class="step-desc">Where will your music live?</p>
+
+    <div class="field-group">
+      <label class="field-label">Target Platforms <span style="color:var(--dim);font-weight:400;text-transform:none;letter-spacing:0">(select all)</span></label>
+      <div class="chip-grid" id="platChips">
+        <span class="chip plat-chip" data-value="Spotify">🟢 Spotify</span>
+        <span class="chip plat-chip" data-value="Apple Music">🍎 Apple Music</span>
+        <span class="chip plat-chip" data-value="YouTube Music">▶️ YouTube Music</span>
+        <span class="chip plat-chip" data-value="SoundCloud">☁️ SoundCloud</span>
+        <span class="chip plat-chip" data-value="Bandcamp">🟠 Bandcamp</span>
+        <span class="chip plat-chip" data-value="Tidal">💧 Tidal</span>
+        <span class="chip plat-chip" data-value="Amazon Music">📦 Amazon Music</span>
+        <span class="chip plat-chip" data-value="TikTok">🎵 TikTok</span>
+        <span class="chip plat-chip" data-value="Instagram">📸 Instagram</span>
+      </div>
+      <div class="field-error" id="err-platforms">Please select at least one platform.</div>
+    </div>
+
+    <div class="field-group">
+      <label class="field-label">Distribution Service</label>
+      <div class="chip-grid" id="distChips">
+        <span class="chip dist-chip" data-value="DistroKid">DistroKid</span>
+        <span class="chip dist-chip" data-value="TuneCore">TuneCore</span>
+        <span class="chip dist-chip" data-value="CD Baby">CD Baby</span>
+        <span class="chip dist-chip" data-value="Amuse">Amuse</span>
+        <span class="chip dist-chip" data-value="RouteNote">RouteNote</span>
+        <span class="chip dist-chip" data-value="Label">Label / Signed</span>
+        <span class="chip dist-chip" data-value="Self-Distributed">Self-Distributed</span>
+      </div>
+    </div>
+
+    <div class="field-group">
+      <label class="field-label" for="releaseType">Release Type</label>
+      <select id="releaseType">
+        <option value="">Select…</option>
+        <option value="Single">Single (1 track)</option>
+        <option value="EP">EP (2–6 tracks)</option>
+        <option value="Album">Album (7+ tracks)</option>
+        <option value="Mixtape">Mixtape</option>
+        <option value="Compilation">Compilation</option>
+      </select>
+    </div>
+
+    <div class="field-group">
+      <label class="field-label" for="promoNotes">Promotion / Marketing Notes</label>
+      <textarea id="promoNotes" rows="3" placeholder="e.g. Social media campaign, playlist pitching, music video, press release…"></textarea>
+    </div>
+  </div>
+
+  <!-- ─────────────────────────────────── STEP 5 – Budget & Timeline -->
+  <div class="step" id="step-5">
+    <h2 class="step-heading">Budget &amp; Timeline</h2>
+    <p class="step-desc">Set your financial expectations and key milestones.</p>
+
+    <div class="field-group">
+      <label class="field-label">Total Budget</label>
+      <div class="range-wrap">
+        <input type="range" id="budgetSlider" min="0" max="50000" step="500" value="2000" oninput="updateBudget(this)" />
+        <div class="range-labels">
+          <span>$0</span><span>$5k</span><span>$10k</span><span>$25k</span><span>$50k+</span>
+        </div>
+        <div class="range-value" id="budgetDisplay">$2,000</div>
+      </div>
+    </div>
+
+    <div class="field-group">
+      <label class="field-label">Milestones</label>
+      <div class="milestone-list" id="milestoneList"></div>
+      <div style="display:flex;gap:0.6rem;flex-wrap:wrap;margin-top:0.5rem" id="milestoneButtons">
+        <button class="chip" onclick="addMilestone('🎙️ Recording complete', '')">+ Recording</button>
+        <button class="chip" onclick="addMilestone('🎚️ Mixing done', '')">+ Mixing</button>
+        <button class="chip" onclick="addMilestone('💿 Mastering done', '')">+ Mastering</button>
+        <button class="chip" onclick="addMilestone('🎨 Artwork ready', '')">+ Artwork</button>
+        <button class="chip" onclick="addMilestone('📤 Submitted to DSPs', '')">+ Submission</button>
+        <button class="chip" onclick="addMilestone('🚀 Release Day', '')">+ Release</button>
+        <button class="chip" onclick="addMilestone('📣 Press outreach', '')">+ Press</button>
+      </div>
+    </div>
+
+    <div class="field-group">
+      <label class="field-label" for="extraNotes">Additional Notes</label>
+      <textarea id="extraNotes" rows="3" placeholder="Anything else you want to remember about this project…"></textarea>
+    </div>
+  </div>
+
+  <!-- ─────────────────────────────────── SUMMARY -->
+  <div class="step" id="step-summary">
+    <div class="summary-hero">
+      <div class="big-emoji">🎉</div>
+      <h2>Your Project Plan is Ready!</h2>
+      <p id="summarySubtitle">Here's an overview of your music project.</p>
+    </div>
+    <div class="summary-grid" id="summaryGrid"></div>
+    <div class="summary-actions">
+      <button class="btn-action primary" onclick="printSummary()">🖨️ Print / Save PDF</button>
+      <button class="btn-action green" onclick="copyToClipboard()">📋 Copy to Clipboard</button>
+      <a class="btn-action secondary" href="music_budget_calculator.html">💰 Budget Calculator</a>
+      <button class="btn-action secondary" onclick="startOver()">↩️ Start Over</button>
+    </div>
+  </div>
+
+  <!-- Navigation -->
+  <div class="nav-row" id="navRow">
+    <button class="btn-nav btn-prev" id="btnPrev" onclick="prevStep()" style="display:none">← Back</button>
+    <span class="step-counter" id="stepCounter">Step 1 of 5</span>
+    <button class="btn-nav btn-next" id="btnNext" onclick="nextStep()">Continue →</button>
+  </div>
+
+</div>
+
+<script>
+  let currentStep = 1;
+  const TOTAL_STEPS = 5;
+
+  // ─── State ───────────────────────────────────────────────
+  const state = {
+    projectName: '',
+    genres: [],
+    moods: [],
+    releaseDate: '',
+    trackCount: '',
+    avgDuration: '',
+    instruments: [],
+    mixing: '',
+    recording: '',
+    team: [],
+    platforms: [],
+    distribution: '',
+    releaseType: '',
+    promoNotes: '',
+    budget: 2000,
+    milestones: [],
+    extraNotes: ''
+  };
+
+  // ─── Chip setup (multi & single select) ──────────────────
+  function setupChips() {
+    // Multi-select groups
+    document.querySelectorAll('.genre-chip').forEach(c => c.addEventListener('click', () => toggleChip(c, 'genres')));
+    document.querySelectorAll('.mood-chip').forEach(c => c.addEventListener('click', () => toggleChip(c, 'moods')));
+    document.querySelectorAll('.inst-chip').forEach(c => c.addEventListener('click', () => toggleChip(c, 'instruments')));
+    document.querySelectorAll('.plat-chip').forEach(c => c.addEventListener('click', () => toggleChip(c, 'platforms')));
+
+    // Single-select groups
+    document.querySelectorAll('[data-group="mix"]').forEach(c => c.addEventListener('click', () => singleChip(c, 'mix', 'mixing')));
+    document.querySelectorAll('[data-group="rec"]').forEach(c => c.addEventListener('click', () => singleChip(c, 'rec', 'recording')));
+    document.querySelectorAll('.dist-chip').forEach(c => c.addEventListener('click', () => singleChip(c, 'dist', 'distribution')));
+  }
+
+  function toggleChip(chip, key) {
+    chip.classList.toggle('selected');
+    const val = chip.dataset.value;
+    if (chip.classList.contains('selected')) {
+      if (!state[key].includes(val)) state[key].push(val);
+    } else {
+      state[key] = state[key].filter(v => v !== val);
+    }
+  }
+
+  function singleChip(chip, group, key) {
+    document.querySelectorAll(`[data-group="${group}"]`).forEach(c => c.classList.remove('selected'));
+    chip.classList.add('selected');
+    state[key] = chip.dataset.value;
+  }
+
+  // ─── Budget slider ────────────────────────────────────────
+  function updateBudget(el) {
+    const val = parseInt(el.value);
+    state.budget = val;
+    document.getElementById('budgetDisplay').textContent = '$' + val.toLocaleString();
+    const pct = ((val / 50000) * 100).toFixed(1) + '%';
+    el.style.setProperty('--pct', pct);
+  }
+  // Set initial gradient
+  window.addEventListener('load', () => {
+    const s = document.getElementById('budgetSlider');
+    s.style.setProperty('--pct', ((2000/50000)*100).toFixed(1)+'%');
+  });
+
+  // ─── Team members ─────────────────────────────────────────
+  function addMember() {
+    const name = document.getElementById('memberName').value.trim();
+    const role = document.getElementById('memberRole').value;
+    const err  = document.getElementById('err-member');
+    if (!name) { err.textContent = 'Enter a name.'; err.classList.add('show'); return; }
+    if (!role) { err.textContent = 'Select a role.'; err.classList.add('show'); return; }
+    err.classList.remove('show');
+    state.team.push({ name, role });
+    document.getElementById('memberName').value = '';
+    document.getElementById('memberRole').value = '';
+    renderTeam();
+  }
+
+  function removeMember(i) {
+    state.team.splice(i, 1);
+    renderTeam();
+  }
+
+  function renderTeam() {
+    const list = document.getElementById('teamList');
+    const emojis = ['🎵','🎤','🎸','🎹','🥁','🎷','🔊','🎨','📹','📱','💼','✨'];
+    list.innerHTML = state.team.map((m, i) => `
+      <div class="team-member-card">
+        <div class="member-avatar">${emojis[i % emojis.length]}</div>
+        <div class="member-info">
+          <div class="member-name">${escHtml(m.name)}</div>
+          <div class="member-role">${escHtml(m.role)}</div>
+        </div>
+        <button class="btn-remove" onclick="removeMember(${i})" title="Remove">✕</button>
+      </div>
+    `).join('');
+  }
+
+  // ─── Milestones ───────────────────────────────────────────
+  function addMilestone(text, date) {
+    state.milestones.push({ text, date: date || '' });
+    renderMilestones();
+  }
+
+  function removeMilestone(i) {
+    state.milestones.splice(i, 1);
+    renderMilestones();
+  }
+
+  function renderMilestones() {
+    const list = document.getElementById('milestoneList');
+    list.innerHTML = state.milestones.map((m, i) => `
+      <div class="milestone-item">
+        <span class="milestone-icon">📌</span>
+        <span class="milestone-text">${escHtml(m.text)}</span>
+        <input type="date" style="width:160px;padding:0.3rem 0.5rem;font-size:0.8rem"
+               value="${escHtml(m.date)}" onchange="state.milestones[${i}].date=this.value" />
+        <button class="btn-remove" onclick="removeMilestone(${i})">✕</button>
+      </div>
+    `).join('');
+  }
+
+  // ─── Validation ───────────────────────────────────────────
+  function validate(step) {
+    let ok = true;
+    if (step === 1) {
+      const name = document.getElementById('projectName').value.trim();
+      state.projectName = name;
+      if (!name) { show('err-projectName'); ok = false; } else { hide('err-projectName'); }
+      if (state.genres.length === 0) { show('err-genre'); ok = false; } else { hide('err-genre'); }
+    }
+    if (step === 2) {
+      state.trackCount = document.getElementById('trackCount').value;
+      state.avgDuration = document.getElementById('avgDuration').value;
+      if (!state.mixing) { show('err-mix'); ok = false; } else { hide('err-mix'); }
+    }
+    if (step === 4) {
+      if (state.platforms.length === 0) { show('err-platforms'); ok = false; } else { hide('err-platforms'); }
+      state.releaseType = document.getElementById('releaseType').value;
+      state.promoNotes  = document.getElementById('promoNotes').value;
+    }
+    if (step === 5) {
+      state.extraNotes = document.getElementById('extraNotes').value;
+    }
+    return ok;
+  }
+
+  function show(id) { document.getElementById(id).classList.add('show'); }
+  function hide(id) { document.getElementById(id).classList.remove('show'); }
+  function escHtml(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+  // ─── Navigation ───────────────────────────────────────────
+  function nextStep() {
+    if (!validate(currentStep)) return;
+    // Collect remaining fields
+    if (currentStep === 1) state.releaseDate = document.getElementById('releaseDate').value;
+
+    if (currentStep < TOTAL_STEPS) {
+      goToStep(currentStep + 1);
+    } else {
+      buildSummary();
+      goToStep('summary');
+    }
+  }
+
+  function prevStep() {
+    if (currentStep === 'summary') {
+      goToStep(TOTAL_STEPS);
+    } else if (currentStep > 1) {
+      goToStep(currentStep - 1);
+    }
+  }
+
+  function goToStep(n) {
+    // Hide current
+    const prev = currentStep === 'summary' ? 'step-summary' : `step-${currentStep}`;
+    document.getElementById(prev).classList.remove('active');
+
+    // Update progress dots
+    if (typeof currentStep === 'number') {
+      updateDot(currentStep, 'done');
+    }
+
+    currentStep = n;
+
+    // Show new
+    const curr = n === 'summary' ? 'step-summary' : `step-${n}`;
+    document.getElementById(curr).classList.add('active');
+
+    if (n === 'summary') {
+      document.getElementById('navRow').style.display = 'none';
+      // mark all dots done
+      for (let i = 1; i <= TOTAL_STEPS; i++) updateDot(i, 'done');
+    } else {
+      document.getElementById('navRow').style.display = 'flex';
+      updateDot(n, 'active');
+      document.getElementById('stepCounter').textContent = `Step ${n} of ${TOTAL_STEPS}`;
+      document.getElementById('btnPrev').style.display = n > 1 ? 'inline-flex' : 'none';
+      document.getElementById('btnNext').textContent = n === TOTAL_STEPS ? '🎉 Finish' : 'Continue →';
+      document.getElementById('btnNext').className = n === TOTAL_STEPS ? 'btn-nav btn-finish' : 'btn-nav btn-next';
+    }
+
+    updateProgressLine();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function updateDot(n, state) {
+    const dots = document.querySelectorAll('.step-dot');
+    const lbls = document.querySelectorAll('.step-lbl');
+    const dot = dots[n - 1];
+    const lbl = lbls[n - 1];
+    dot.classList.remove('active', 'done');
+    lbl.classList.remove('active', 'done');
+    dot.classList.add(state);
+    lbl.classList.add(state);
+    if (state === 'done') dot.textContent = '';
+  }
+
+  function updateProgressLine() {
+    const n = typeof currentStep === 'number' ? currentStep : TOTAL_STEPS + 1;
+    const pct = ((n - 1) / TOTAL_STEPS) * 100;
+    document.getElementById('progressLine').style.width = pct + '%';
+  }
+
+  // ─── Summary ──────────────────────────────────────────────
+  function buildSummary() {
+    document.getElementById('summarySubtitle').textContent =
+      state.projectName ? `"${state.projectName}" — let's make it happen! 🚀` : 'Let\'s make it happen! 🚀';
+
+    const grid = document.getElementById('summaryGrid');
+    grid.innerHTML = '';
+
+    // Section helper
+    const section = (icon, title, rows) => {
+      const div = document.createElement('div');
+      div.className = 'summary-section';
+      const rowsHtml = rows.filter(r => r[1]).map(([k, v]) => `
+        <div class="summary-row">
+          <span class="summary-key">${escHtml(k)}</span>
+          <span class="summary-val">${v}</span>
+        </div>`).join('');
+      div.innerHTML = `
+        <div class="summary-section-title">${icon} ${escHtml(title)}</div>
+        ${rowsHtml}`;
+      return div;
+    };
+
+    const tags = (arr, cls='') => arr.length
+      ? `<div class="tag-list">${arr.map(v=>`<span class="tag ${cls}">${escHtml(v)}</span>`).join('')}</div>`
+      : '';
+
+    grid.appendChild(section('🎵', 'Project Basics', [
+      ['Project Name',  `<strong style="color:#fff">${escHtml(state.projectName)}</strong>`],
+      ['Genre',         tags(state.genres)],
+      ['Mood / Vibe',   tags(state.moods)],
+      ['Release Date',  state.releaseDate ? new Date(state.releaseDate + 'T00:00').toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'}) : ''],
+    ]));
+
+    grid.appendChild(section('🎛️', 'Production', [
+      ['Tracks',            state.trackCount ? `${state.trackCount} track${state.trackCount > 1 ? 's' : ''}` : ''],
+      ['Avg. Length',       state.avgDuration ? `${state.avgDuration} min/track` : ''],
+      ['Instruments',       tags(state.instruments)],
+      ['Mixing / Mastering', state.mixing ? escHtml(state.mixing) : ''],
+      ['Recording Setup',    state.recording ? escHtml(state.recording) : ''],
+    ]));
+
+    if (state.team.length > 0) {
+      grid.appendChild(section('👥', 'Team', [
+        ['Members', `<div class="tag-list">${state.team.map(m=>`<span class="tag">${escHtml(m.role.replace(/[^\w\s&']/g,'').trim())} – ${escHtml(m.name)}</span>`).join('')}</div>`],
+      ]));
+    }
+
+    grid.appendChild(section('🚀', 'Release & Distribution', [
+      ['Release Type',   state.releaseType ? escHtml(state.releaseType) : ''],
+      ['Platforms',      tags(state.platforms)],
+      ['Distributor',    state.distribution ? escHtml(state.distribution) : ''],
+      ['Promo Notes',    state.promoNotes ? `<em style="color:#a0a0c0">${escHtml(state.promoNotes)}</em>` : ''],
+    ]));
+
+    const milestonesHtml = state.milestones.length
+      ? `<div class="tag-list">${state.milestones.map(m=>`<span class="tag">📌 ${escHtml(m.text)}${m.date?' · '+new Date(m.date+'T00:00').toLocaleDateString('en-US',{month:'short',day:'numeric'}):''}</span>`).join('')}</div>`
+      : '';
+
+    grid.appendChild(section('💰', 'Budget & Timeline', [
+      ['Total Budget',  `<strong style="color:var(--purple)">${'$'+state.budget.toLocaleString()}</strong>`],
+      ['Milestones',    milestonesHtml],
+      ['Notes',         state.extraNotes ? `<em style="color:#a0a0c0">${escHtml(state.extraNotes)}</em>` : ''],
+    ]));
+  }
+
+  // ─── Actions ──────────────────────────────────────────────
+  function printSummary() { window.print(); }
+
+  function startOver() {
+    if (confirm('Start a new project? Your current plan will be cleared.')) {
+      location.reload();
+    }
+  }
+
+  function copyToClipboard() {
+    const lines = [
+      `🎵 Music Project Plan`,
+      `=====================`,
+      `Project: ${state.projectName}`,
+      `Genre: ${state.genres.join(', ')}`,
+      `Mood: ${state.moods.join(', ')}`,
+      `Release Date: ${state.releaseDate}`,
+      ``,
+      `Production`,
+      `----------`,
+      `Tracks: ${state.trackCount}`,
+      `Avg. Length: ${state.avgDuration} min`,
+      `Instruments: ${state.instruments.join(', ')}`,
+      `Mixing: ${state.mixing}`,
+      `Recording: ${state.recording}`,
+      ``,
+      `Team`,
+      `----`,
+      ...state.team.map(m => `${m.role}: ${m.name}`),
+      ``,
+      `Release & Distribution`,
+      `----------------------`,
+      `Type: ${state.releaseType}`,
+      `Platforms: ${state.platforms.join(', ')}`,
+      `Distributor: ${state.distribution}`,
+      `Promo: ${state.promoNotes}`,
+      ``,
+      `Budget & Timeline`,
+      `-----------------`,
+      `Budget: $${state.budget.toLocaleString()}`,
+      ...state.milestones.map(m => `📌 ${m.text}${m.date?' – '+m.date:''}`),
+      ``,
+      `Notes: ${state.extraNotes}`,
+    ];
+
+    navigator.clipboard.writeText(lines.join('\n')).then(() => {
+      const btn = document.querySelector('.btn-action.green');
+      btn.textContent = '✅ Copied!';
+      setTimeout(() => btn.innerHTML = '📋 Copy to Clipboard', 2500);
+    }).catch(() => alert('Could not copy. Please manually select and copy the text.'));
+  }
+
+  // ─── Init ─────────────────────────────────────────────────
+  setupChips();
+  updateProgressLine();
+  document.getElementById('btnPrev').style.display = 'none';
+
+  // Allow pressing Enter to advance
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Enter' && e.target.tagName !== 'TEXTAREA' && e.target.tagName !== 'BUTTON') {
+      nextStep();
+    }
+  });
+</script>
+
+</body>
+</html>
